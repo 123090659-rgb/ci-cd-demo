@@ -8,6 +8,10 @@ on:
     paths:
       - "data/**"
 
+# The workflow commits orders.db back to the repo, so it needs write access
+permissions:
+  contents: write
+
 jobs:
   update-database:
     runs-on: ubuntu-latest
