@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Data Pipeline</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; color: #222; }
+        h1 { color: #2c3e50; }
+        h2 { color: #34495e; margin-top: 32px; }
+        table { border-collapse: collapse; margin-top: 12px; }
+        th, td { border: 1px solid #bdc3c7; padding: 8px 14px; text-align: left; }
+        th { background: #2c3e50; color: #fff; }
+        tr:nth-child(even) { background: #f4f6f7; }
+        .note { color: #7f8c8d; font-size: 0.9em; }
+    </style>
+    <meta http-equiv="refresh" content="30">
+</head>
+<body>
+    <h1>Order Data Pipeline</h1>
+    <p class="note">Data is read live from the SQLite database (orders.db). This page reloads every 30 seconds.</p>
+
+    <h2>Merged Orders (orders_merged)</h2>
+    {% if orders %}
+    <table>
+        <tr>{% for col in orders[0].keys() %}<th>{{ col }}</th>{% endfor %}</tr>
+        {% for row in orders %}
+        <tr>{% for value in row.values() %}<td>{{ value }}</td>{% endfor %}</tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No order data found.</p>
+    {% endif %}
+
+    <h2>Average amount_cny by Region (summary_by_region)</h2>
+    <table>
+        <tr><th>region</th><th>avg_amount_cny</th></tr>
+        {% for row in summary %}
+        <tr><td>{{ row['region'] }}</td><td>{{ '%.2f' | format(row['avg_amount_cny']) }}</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

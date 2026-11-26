@@ -1,0 +1,48 @@
+name: Data Pipeline
+
+# TRIGGERS
+# - Only runs when a pushed commit changes any file inside the 'data/' folder
+#   (changes to other files, e.g. the workflows themselves, will NOT trigger it)
+on:
+  push:
+    paths:
+      - "data/**"
+
+jobs:
+  update-database:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Download the repository code into the runner
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # 2. Use Python 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Install necessary packages (sqlite3 is built into Python's standard library)
+      - name: Install dependencies
+        run: |
+          pip install pandas
+          pip install flask
+
+      # 4. Run the pipeline: clean, convert to CNY, merge, and update orders.db
+      - name: Run clean_and_merge
+        run: python clean_and_merge.py
+
+      # 5. Commit the updated database back to the repository,
+      #    so pulling locally brings the fresh database down to the desktop/laptop
+      - name: Commit updated database
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add orders.db
+          if git diff --cached --quiet; then
+            echo "Database unchanged - nothing to commit"
+          else
+            git commit -m "Update orders.db (automated data pipeline run)"
+            git push
+          fi
