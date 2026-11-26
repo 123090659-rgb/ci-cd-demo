@@ -1,0 +1,37 @@
+name: CI
+
+# TRIGGERS
+# - push to the "main" branch  -> run tests every time code is pushed to main
+# - pull_request targeting main -> run tests on every PR before it is merged
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    # Run the test suite on multiple Python versions (a build "matrix")
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      # 1. Download the repository code into the runner
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # 2. Install the Python version from the matrix
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 3. Install project dependencies
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. Run the automated tests with pytest
+      - name: Run tests
+        run: pytest -v
