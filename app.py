@@ -15,9 +15,9 @@ def index():
     return jsonify(message="Hello from the CI/CD demo app!")
 
 
-@app.route("/add/<float:a>/<float:b>")
-def add_numbers(a: float, b: float):
-    return jsonify(a=a, b=b, result=add(a, b))
+@app.route("/add/<a>/<b>")
+def add_numbers(a: str, b: str):
+    return jsonify(a=float(a), b=float(b), result=add(float(a), float(b)))
 
 
 @app.route("/health")
